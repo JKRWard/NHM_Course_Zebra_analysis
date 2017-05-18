@@ -3,7 +3,7 @@ library(tidyverse)
 library(ggfortify)
 
 # Reading in the data
-rawd <- read_csv("2017-05-15_zebra-collection-data.csv")
+rawd <- read_csv("./data/2017-05-15_zebra-collection-data.csv")
 # Checking the data
 tbl_df(rawd)
 glimpse(rawd)
