@@ -21,10 +21,24 @@ library(knitr)
 
 
 ```{r}
-# Load functions that summarise data - R markdown needs to have these up front
+# Load functions that summarise data - R markdown needs to have these up front befroe the rest of the ode. In an R script, the functions can be at the end.
 
 my_test_ANOVA <- function (df, categorical_name, continuous_name, xlabel, ylabel){
-  #Dataset is a dataframe, the names are strings
+# Function takes a dataframe, and two strings: a categorical variable and a continuous variable. it then does a boxplot and an ANOVA
+
+#Syntax: myresult <- my_test_ANOVA(df, categorical_name, continuous_name, xlabel, ylabel)
+# categorical_name and continuous_name are both strings
+# Function returns a list with the following items:
+#[1] "Figure" = boxplot of the original data
+#[2] "Model" = fitted model
+#[3] "Autoplot" = autoplot of the original data
+#[4] "ANOVA" = ANOVA
+#[5] "Coeffs" = coefficients from ANOVA
+
+#After you have called the function, you can access these things e.g.
+# myresult[1] - will give you the plot
+# myresult[4] - will give you the ANOVA table
+
 # aes_string took me forever to find
 
 # 1. PLOT your data
