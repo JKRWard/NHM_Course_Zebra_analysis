@@ -15,6 +15,7 @@ library(ggplot2)
 library(ggfortify)
 library(pander)
 library(knitr)
+library(broom)
 ```
 
 #Methods
@@ -109,6 +110,37 @@ newlist <- list("Figure" = myplot, "Model" = mymodel, "Autoplot" = myautoplot, "
 return(newlist)
 }
 
+# Example function to pass a string
+testt <- function(df, col1) {
+
+df[ , which(names(iris) == col1)]
+
+}
+
+testt(iris, "Sepal.Length")
+
+
+# To debug
+
+testt <- function(df, col1) {
+  #  browser()
+  df[ , which(names(iris) == col1)]
+  
+}
+
+# Helpful R package for dealing with factors
+
+library(forcats)
+# More infromation at http://github.com/hadley/forcats
+
+# http://forcats.tidyverse.org/
+# http://forcats.tidyverse.org/reference/index.html
+
+
+v1 <- c("Jan", "Feb", "Mar")
+v1 <- as.factor(v1)
+
+
 ```
 
 
@@ -127,11 +159,13 @@ sk_length_res <- my_test_ANOVA(burchelli_sg, "species", "skull_length", "Burchel
 sk_width_res <- my_test_ANOVA(burchelli_sg, "species", "skull_width", "Burchelli subspecies", "Width of skull (mm)")
 
 # Analysis with dataset omitting subspecies
+
+
 # Run with subspecies included first
 
 #t_length_pb_t_width_cv_sex_res <- my_test_ANCOVA(burchelli_sg, "tooth_p1_length", "tooth_p1_width", "sex", "Length of tooth P1 (mm)", "Width of tooth P1 (mm)")
 
-df <- burchelli_sg
+df <- zebra
 continuous_predictor_name <- "tooth_p1_length"
 continuous_response_name <- "tooth_p1_width"
 categorical_name <- "sex"
@@ -147,6 +181,10 @@ firstplot
  
 # 2. Make a model (with an interaction term)
 mymodel <- lm(formula = as.formula(paste(continuous_response_name," ~ ",continuous_predictor_name," * ",categorical_name,sep="")), data = df)
+
+tidy_test <- tidy(mymodel)
+tbl_df(tidy_test)
+browser()
 
 # 3. Look at the assumptions
 myautoplot <- autoplot(mymodel, smooth.colour = NA)
@@ -166,13 +204,19 @@ my_formula1 <- paste(continuous_predictor_name," = seq(from = ",min_x,", to = ",
 
 # Just need to solve the problem of how to get the umique categories then I'm done
 
-unique_categories <- unique(select(df,eval((parse(text = paste(continuous_predictor_name))))))
+# levels
 
-tbl_df(unique_categories)
+#unique_categories <- unique(select(df,eval((parse(text = paste(continuous_predictor_name))))))
+
+#tbl_df(unique_categories)
 
 my_formula2 <- paste("sex = c(\"Male\",\"Female\")", sep="")
 
 newX <- eval(parse(text = paste("expand.grid(",my_formula1, ", ", my_formula2, ")"))) 
+
+substitute()
+
+
 newY <- predict(mymodel, newdata = newX, interval = "confidence", level = 0.95)
 
 addThese <- data.frame(newX, newY)
@@ -183,6 +227,9 @@ colnames(addThese)[3] <- continuous_response_name
 newplot <- firstplot +
   geom_smooth(data = addThese, aes_string(x = continuous_predictor_name, y = continuous_response_name, ymin = "lwr", ymax = "upr", color = categorical_name), stat = "identity")
 newplot
+
+modeltable <- tidy(mymodel)
+
 
 # Return list of outputs
 newlist <- list("Figure" = firstplot, "Model" = mymodel, "Autoplot" = myautoplot, "ANOVA" = myanova, "Coeffs" = mytable_of_doom)
@@ -201,47 +248,50 @@ newlist <- list("Figure" = firstplot, "Model" = mymodel, "Autoplot" = myautoplot
 
 newlist[1]
 newlist[3]
-pander(newlist[4])
-pander(newlist[5])
-
+pander(tidy(mymodel), justify = c('left','right','right','right','right'), style = 'rmarkdown')
 
 ```
 
 #Appendix
-##1. Does Burchelli subspecies significantly affect the length of tooth P1?
+##1. Does Burchelli subspecies significantly affect tooth length (P1)?
 
 ```{r, echo = FALSE}
-t_length_res[1]
-t_length_res[3]
-pander(t_length_res[4])
-pander(t_length_res[5])
+
+# tbl_df(t_length_res[2])
+# 
+# t_length_res[1]
+# t_length_res[3]
+#pander(tidy(t_length_res[2,2]))
+#pander(t_length_res[4])
+#pander(t_length_res[5])
 ```
 
 #Appendix
-##2. Does Burchelli subspecies significantly affect the width of tooth P1?
+##2. Does Burchelli subspecies significantly affect the tooth width (P1)?
 
 ```{r, echo = FALSE}
-t_width_res[1]
-t_width_res[3]
-pander(t_width_res[4])
+# # t_width_res[1]
+# # t_width_res[3]
+# pander(t_length_res[4])
+# pander(t_length_res[5])
 ```
 
 #Appendix
 ##3. Does Burchelli subspecies significantly affect skull length?
 
 ```{r, echo = FALSE}
-sk_length_res[1]
-sk_length_res[3]
-pander(sk_length_res[4])
+# sk_length_res[1]
+# sk_length_res[3]
+# pander(sk_length_res[4])
 ```
 
 #Appendix
 ##4. Does Burchelli subspecies significantly affect skull width?
 
 ```{r, echo = FALSE}
-sk_width_res[1]
-sk_width_res[3]
-pander(sk_width_res[4])
+# sk_width_res[1]
+# sk_width_res[3]
+# pander(sk_width_res[4])
 ```
 
 ```
