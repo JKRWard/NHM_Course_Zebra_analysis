@@ -1,0 +1,38 @@
+---
+title: "Zebra skulls"
+author: "Team Zebra"
+date: "18 May 2017"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Introduction
+Black with white stripes or white with black stripes? 
+Does anyone actually care?
+
+sdgsdgsfh adsghskahsgjad ashfksdhglas 
+
+### Methods
+A total of 28 zebra skulls were selected from the Natural History Museum collection. The skulls belonged to two species of zebra; four Equus grevyi and 24 Equus burchelli. 
+
+Zebra skull length was measured using a rule place on the table. Each skull was placed beside the rule so that the ventral surface of the upper jaw was displayed. An exercise book was placed at the posterior and anterior of each skull and the distance between the two were measured (Figure 1).
+
+![Figure 1. Zebra skull measurement method](IMG_0708.JPG)
+
+
+In addition to the skull length measurement premolar one (P1) on the right hand side of each skull was measured using a pair of calipers.
+
+
+![Figure 2. Zebra skull measurement method](IMG_0712.JPG)
+
+
+
+###Results
+
+
+###Discussion
