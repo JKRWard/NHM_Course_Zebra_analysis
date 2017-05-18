@@ -11,9 +11,12 @@ knitr::opts_chunk$set(echo = TRUE)
 looking for allometry
 does tooth area increase at the same rate as skull area
 
+```{r}
 library(ggplot2)
 library(tidyverse)
 library(stringr)
+library(ggfortify)
+```
 
 
 ```{r}
@@ -55,11 +58,11 @@ plotting graph looking for allometry
 
 ```{r}
 newX <- expand.grid(skull_length = seq(from = 500, to = 624, length = 100))
-head(x)
+head(newX)
 
 
 newY <- predict(model1, newdata = newX, interval = "confidence")
-head(Y)
+head(newY)
 
 
 addThese <- data.frame(newX, newY)
