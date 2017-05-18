@@ -55,7 +55,9 @@ head(addThese)
 
 ggplot(zebra, aes(x = skull_length, y = tooth_p1_length)) + 
   geom_point(col = "coral", size = 3) +
-  labs(x = "Skull width (mm)", y = "Length of first pre molar (mm)") +
+  labs(x = "Skull length (mm)", y = "Length of first pre molar (mm)") +
   theme_bw() +
   geom_smooth(data = addThese, aes(ymin = lwr, ymax = upr), stat = "identity")
-
+#---------------------------------------------------------
+# line has a gradient of 1:1 , tooth length increases proprtioanly with skull length
+#------------------------------------------------------
