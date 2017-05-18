@@ -1,0 +1,85 @@
+---
+title: "Zebra skull analysis"
+author: "Jessica Ward"
+date: "16/05/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+```
+
+####Introduction
+
+Black with white stripes or white with black stripes? 
+Does anyone actually care?
+
+We investigated allomety in two zebra species using skull measurements taken from museum specimins. At this point I would usually write a bit about about why we are doing this study maybe give you some nice zebra facts, however as we are lacking in zebra information we have included a fun zebra gif for you. 
+
+![Dancing zebra!! Woohoo](https://media.giphy.com/media/bHoFqabfGJLpu/giphy.gif?response_id=591dbf997c2f1a226c5beb57)
+
+
+```{r}
+# library(tidyverse)
+# rawd <- read_csv("./data/2017-05-15_zebra-collection-data.csv")
+# # looking only at the burcelli species 
+# bur <- rawd %>% filter(!species =="Equus_greyvi")
+```
+
+### Methods
+A total of `r nrow(rawd)` zebra skulls were selected from the Natural History Museum collection. The skulls belonged to two species of zebra; four Equus grevyi and 24 Equus burchelli. 
+
+Zebra skull length was measured using a rule place on the table. Each skull was placed beside the rule so that the ventral surface of the upper jaw was displayed. An exercise book was placed at the posterior and anterior of each skull and the distance between the two were measured (Figure 1).
+
+![Figure 1. Zebra skull measurement method](IMG_0708.JPG)
+
+
+In addition to the skull length measurement premolar one (P1) on the right hand side of each skull was measured using a pair of calipers.
+
+
+![Figure 2. Zebra skull measurement method](IMG_0712.JPG)
+
+
+
+###Results
+
+
+
+
+
+
+
+Table
+```{r}
+library(knitr)
+kable(head(iris))
+```
+
+```{r}
+# Creating a boxplot to look at the variation in skull length in the different species 
+box <- ggplot(rawd) +
+  geom_boxplot(aes(species, skull_length)) +
+  coord_flip()
+
+box
+```
+
+
+```{r}
+# creating an attribute table
+library(RCurl)
+eval(parse(text = getURL(
+    "https://raw.githubusercontent.com/annakrystalli/ACCE_RDM/master/R/eml_utils.R",
+    ssl.verifypeer = FALSE)))
+
+attr_shell <- get_attr_shell(rawd)
+attr_shell
+```
+
+![Bear](https://placebear.com/g/200/300)
+
+<img src="IMG_0711.JPG" alt="Figure.1 Zebra skull" height="42" width="42">
+
+![Figure.1 Zebra skull](IMG_0711.JPG)
+
+[This is our repo](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
