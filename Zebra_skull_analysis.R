@@ -67,7 +67,3 @@ summary(zmodel1)
 # can we use skull length to predict skull width 
 # create new x and new y 
 
-#this is a change that I am making but it is wrong 
-
-#this is a change that I want to keep 
-#
