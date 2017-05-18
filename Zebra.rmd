@@ -45,7 +45,8 @@ my_test_ANOVA <- function (df, categorical_name, continuous_name, xlabel, ylabel
 # 1. PLOT your data
  myplot <- ggplot(data = df, aes_string(x = categorical_name, y = continuous_name)) +
     geom_boxplot() +
-   labs(x = xlabel, y = ylabel)
+   labs(x = xlabel, y = ylabel)+
+   coord_flip()
  
 # 2. Fit your model
 mymodel <- lm(formula = as.formula(paste(continuous_name,categorical_name,sep="~")), data = df)

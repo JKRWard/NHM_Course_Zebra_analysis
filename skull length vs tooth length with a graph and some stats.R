@@ -6,13 +6,13 @@ library(tidyverse)
 library(stringr)
 
 #zebra graphs and analysis
-zebra <- read_csv("2017-05-15_zebra-collection-data.csv")
+zebra <- read_csv("./data/2017-05-15_zebra-collection-data.csv")
 glimpse(zebra)
 
 #--------------------------------
 # plot a graphics
-ggplot(zebra, aes(skull_length , tooth_p1_length)) +
-  geom_point(size = 3 , colour = "coral")
+ggplot(zebra, aes(skull_length , tooth_p1_length, color = species)) +
+  geom_point(size = 3)
 
 #-----------------------------
 # making the model

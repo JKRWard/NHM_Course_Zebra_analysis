@@ -1,0 +1,734 @@
+---
+title: "Zebra skull analysis"
+author: "Joe Bostok-Jones, Joe Broomfield, Matthew Greenwell, Heather Lang, Jessica Ward"
+date: "16 May 2017"
+output:
+  html_document:
+    fig_width: 7
+    self_contained: no
+    theme: journal
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+  ioslides_presentation:
+    highlight: pygments
+    widescreen: yes
+---
+
+
+<script>window.twttr = (function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0],
+    t = window.twttr || {};
+  if (d.getElementById(id)) return t;
+  js = d.createElement(s);
+  js.id = id;
+  js.src = "https://platform.twitter.com/widgets.js";
+  fjs.parentNode.insertBefore(js, fjs);
+
+  t._e = [];
+  t.ready = function(f) {
+    t._e.push(f);
+  };
+
+  return t;
+}(document, "script", "twitter-wjs"));</script>
+
+```{r, echo = FALSE, include = FALSE}
+library(ggplot2)
+library(tidyverse)
+library(stringr)
+library(ggfortify)
+library(pander)
+library(knitr)
+library(broom)
+```
+
+
+```{r, echo = F}
+
+if(names(rmarkdown::metadata$output)[1] == "html_document"){
+    hash <- "#"}
+if(names(rmarkdown::metadata$output)[1] == "ioslides_presentation"){
+    hash <- ""}
+```
+
+<br>
+
+# **Abstract**
+
+- Black with white stripes or white with black stripes? 
+- Does anyone actually care?
+
+<br>
+<br>
+
+# **Introduction**
+
+- We investigated allometry in zebras using measurements taken from museum specimen skulls
+- At this point we would usually:
+    + write a bit about about why we are doing this study
+    + maybe give you some nice zebra facts
+- As we are lacking in zebra information, however, we have included a fun zebra gif for you
+
+![Dancing zebra!! Woohoo](https://media.giphy.com/media/bHoFqabfGJLpu/giphy.gif?response_id=591dbf997c2f1a226c5beb57)
+
+<br>
+<br>
+
+
+```{r echo = FALSE, include = FALSE}
+rawd <- read_csv("./data/2017-05-15_zebra-collection-data.csv")
+# looking only at the burcelli species 
+# bur <- rawd %>% filter(!species =="Equus_greyvi")
+```
+
+# **Methods**
+
+## **Sample selection**
+- Zebra skulls were sampled from the collections of the Natural History Museum, London, UK
+
+## **Measurements**
+- Zebra skull length was measured using a rule placed on the table
+    + Each skull was placed beside the rule so that the ventral surface of the upper jaw was displayed
+    + An exercise book was placed at the posterior and anterior of each skull and the distance between the two was measured (Figure 1)
+<br>
+![Figure 1. Zebra skull length measurement method](./images/zebra_skull_length_measurement-method.png)
+<br>
+<br>
+- Premolar one (P1) on the right hand side of each skull was measured using a pair of calipers (Figure 2)
+<br>
+    +
+![Figure 2. Zebra P1 length measurement method](./images/zebra_tooth-P1_length_measurement-method.png)
+
+## **Statistical analyses**
+- Analyses of the relationship between skull length and P1 molar length were conducted in R version 3.4.0
+
+# **Results**
+
+## **Sample description**
+
+- All skulls sampled (N = `r nrow(rawd)`) were included in the full analysis set
+    + The skulls belonged to $$$two species of zebra; *Equus grevyi* (n = 4) and *Equus burchelli* (n = 24)
+    + An unknown number of *Equus zebra* skulls were stuck in cupboards that would not unlock, and were excluded from the study
+- The mean skull length was XXX and the mean skull width was XXX (N = `r nrow(rawd)`
+- The full <a href="./data/2017-05-15_zebra-collection-data.csv", target = "_blank">dataset</a> and <a href="./data/Zebra_attributes.csv", target = "_blank">metadata</a> are available as supplementary material [insert copyright details here when we have had the session on it]
+
+## **Relationship between skull length and P1 molar length**
+
+```{r, echo = FALSE, include = FALSE}
+zebra <- read_csv("./data/2017-05-15_zebra-collection-data.csv")
+
+# Make new column that collates the subspecies together
+
+newzebra <- zebra %>% rowwise() %>% mutate(newspecies = species)
+
+tbl_df(newzebra)
+#glimpse(zebra)
+```
+
+
+
+```{r}
+ggplot(data = zebra, aes(x = skull_length , y = tooth_p1_length, color = species)) +
+  geom_point(size = 3)
+```
+
+-----------------------------
+making the model
+
+```{r}
+model1 <- lm(tooth_p1_length ~ skull_length, data = zebra)
+```
+
+
+checking the assumptions
+
+```{r}
+autoplot(model1, smooth.colour = NA)
+anova(model1)
+summary(model1)
+```
+
+
+yes, skull length does have a significant effect on tooth length p< 0.001, F = 18.174 dF= 25
+
+-----------------------------------
+plotting graph looking for allometry
+
+```{r, echo = FALSE}
+newX <- expand.grid(skull_length = seq(from = 500, to = 624, length = 100))
+#head(newX)
+
+
+newY <- predict(model1, newdata = newX, interval = "confidence")
+#head(newY)
+
+
+addThese <- data.frame(newX, newY)
+
+addThese <- rename(addThese, tooth_p1_length = fit)
+
+```
+
+plotting the graph with linear regression and confidence limits
+
+```{r, echo = FALSE}
+ggplot(zebra, aes(x = skull_length, y = tooth_p1_length)) + 
+  geom_point(col = "coral", size = 3) +
+  labs(x = "Skull length (mm)", y = "Length of first pre molar (mm)") +
+  theme_bw() +
+  geom_smooth(data = addThese, aes(ymin = lwr, ymax = upr), stat = "identity")
+```
+
+
+```{r, echo = FALSE}
+pander(tidy(model1), justify = c('left','right','right','right','right'), style = 'rmarkdown')
+
+```
+
+In this model, skull length significantly predicts tooth length (p < 0.001).
+
+The model predictions indicate that, in the sample, for every 1 cm increase in skul length, the tooth length increases by 0.5 mm.
+
+
+
+
+
+
+
+## **The grand vision**
+
+> Hans Rosling on open data in 2006
+
+<iframe width="470" height="250" src="https://goo.gl/ry6AiG" frameborder="0" allowfullscreen></iframe>
+
+<p class="accent_border"><b>How do we get there?</p></b>
+
+<br>
+<br>
+
+
+## **Getting a handle on our research materials**
+
+<center>
+<img src="assets/img/beer_messy_tidy.png" height=400px>
+</center>
+
+<br>
+<br>
+
+## **21st Century Research meta-responsibilities**
+
+Better digital curation of the workhorses of modern science: **code** & **data**
+
+- accessible
+- reusable
+- searchable
+<center>
+<h3><b>We all need to do our bit</b></h3>
+<img src="https://metrouk2.files.wordpress.com/2012/08/article-1344528089185-0d5e3c8900000578-276474_636x362.jpg" height=250px>
+</center>
+
+<br>
+<br>
+
+## **Drivers of better digital management**
+
+- Funders: value for money, impact, reputation
+- Publishers: many now require code and data.
+    + Specialist journals for **software** (e.g [Journal of Open Source Software](http://joss.theoj.org/) and **data** (e.g. [Scientific Data](https://www.nature.com/sdata/)) have emerged.
+- Your wider scientific community
+- PIs, Supervisors and immediate research group
+
+### **Yourselves!**
+
+### **be your own best friend:**
+
+> **aim to create secure materials that are easy to use and REUSE**
+
+<br>
+<br>
+
+# Resources
+
+## **Nine simple ways to make it easier to (re)use your data**
+
+We describe nine simple ways to make it easy to reuse the data that you share and also make it easier to work with it yourself. Our recommendations focus on making your data understandable, easy to analyze, and readily available to the wider community of scientists.
+
+<center>
+<img src="https://raw.githubusercontent.com/annakrystalli/ACCE_RDM/master/Rmd/assets/img/ethan.png" height=200px>
+</center>
+
+#### [download](http://ojs.library.queensu.ca/index.php/IEE/article/view/4608/4898)
+
+<br>
+<br>
+
+
+## BES guide to data management {.columns-2}
+
+<img src="assets/img/BES.png" height=500px>
+
+<br>
+
+This guide for early career researchers explains what data and data management are, and provides advice and examples of best practices in data management, including case studies from researchers currently working in ecology and evolution.
+
+<br>
+
+#### [download](http://www.britishecologicalsociety.org/wp-content/uploads/Publ_Data-Management-Booklet.pdf)
+
+<br>
+<br>
+
+
+
+
+## [storify](https://storify.com/tomjwebb/advice-on-research-data-management) by Tom Webb [\@tomjwebb](https://twitter.com/tomjwebb)
+
+<br>
+
+<center>
+<img src="https://raw.githubusercontent.com/annakrystalli/ACCE_RDM/master/Rmd/assets/img/storify.png" height=250px>
+</center>
+
+<br>
+<br>
+
+## [**Blog post**](https://dynamicecology.wordpress.com/2016/08/22/ten-commandments-for-good-data-management/) **by Dynamic ecology** [\@DynamicEcology](https://twitter.com/DynamicEcology)
+
+<br>
+
+<center>
+<img src="https://raw.githubusercontent.com/annakrystalli/ACCE_RDM/master/Rmd/assets/img/vulpes.png" height=300px>
+</center>
+
+<br>
+<br>
+
+## **Data carpentry**
+
+- **Domain specific lessons available** [**free online**](http://www.datacarpentry.org/lessons/)
+    + Ecology materials
+    + Genomics materials
+    + Geospatial data materials
+    + Biology semester long materials
+    
+- **Look out for training sessions**
+
+
+<center>
+<img src="assets/img/data_carpentry.png" height="180">
+</center>
+
+<br>
+<br>
+
+## **Seek help from support teams**
+
+Most university libraries have assistants dedicated to Research Data Management:
+
+<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/tomjwebb">@tomjwebb</a> <a href="https://twitter.com/ScientificData">@ScientificData</a> Talk to their librarian for data management strategies <a href="https://twitter.com/hashtag/datainfolit?src=hash">#datainfolit</a></p>&mdash; Yasmeen Shorish (@yasmeen_azadi) <a href="https://twitter.com/yasmeen_azadi/status/556129700129800192">January 16, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<br>
+<br>
+
+# Basic Data Hygiene
+
+## **Plan your Research Data Management**
+
+- **Start early**. Make an RDM plan before collecting data.
+    - [**RDM checklist**](http://www.dcc.ac.uk/sites/default/files/documents/resource/DMP/DMP_Checklist_2013.pdf)
+
+- Anticipate **data products** as part of your thesis **outputs**
+- Think about what technologies to use
+
+### **Take initiative & responsibility. Think long term.**
+
+<br>
+
+<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr">Act as though every short term study will become a long term one <a href="https://twitter.com/tomjwebb">@tomjwebb</a>. Needs to be reproducible in 3, 20, 100 yrs</p>&mdash; oceans initiative (@oceansresearch) <a href="https://twitter.com/oceansresearch/status/556107891610894337">January 16, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<br>
+<br>
+
+## **Data entering**
+
+### extreme but in many ways defendable
+
+<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/tomjwebb">@tomjwebb</a> stay away from excel at all costs?</p>&mdash; Timothée Poisot (@tpoi) <a href="https://twitter.com/tpoi/status/556107000950829056">January 16, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+## **excel: `read only`**
+
+<blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/tomjwebb">@tomjwebb</a> <a href="https://twitter.com/tpoi">@tpoi</a> excel is fine for data entry. Just save in plain text format like csv. Some additional tips: <a href="https://t.co/8fUv9PyVjC">pic.twitter.com/8fUv9PyVjC</a></p>&mdash; Jaime Ashander (@jaimedash) <a href="https://twitter.com/jaimedash/status/556113131932381185">January 16, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/jaimedash">@jaimedash</a> just don’t let excel anywhere near dates or times.  <a href="https://twitter.com/tomjwebb">@tomjwebb</a> <a href="https://twitter.com/tpoi">@tpoi</a> <a href="https://twitter.com/larysar">@larysar</a></p>&mdash; Dave Harris (@davidjayharris) <a href="https://twitter.com/davidjayharris/status/556126474550263809">January 16, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<br>
+
+## **Databases: more robust**
+
+- good qc and advisable for multiple contributors
+
+<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/tomjwebb">@tomjwebb</a> databases? <a href="https://twitter.com/swcarpentry">@swcarpentry</a> has a good course on SQLite</p>&mdash; Timothée Poisot (@tpoi) <a href="https://twitter.com/tpoi/status/556142573308608513">January 16, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/tomjwebb">@tomjwebb</a> <a href="https://twitter.com/tpoi">@tpoi</a> if the data are moderately complex, or involve multiple people, best to set up a database with well designed entry form 1/2</p>&mdash; Luca Borger (@lucaborger) <a href="https://twitter.com/lucaborger/status/556226732496535552">January 16, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+## **Databases: benefits** {.columns-2}
+
+<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/tomjwebb">@tomjwebb</a> Entering via a database management system (e.g., Access, Filemaker) can make entry easier &amp; help prevent data entry errors <a href="https://twitter.com/tpoi">@tpoi</a></p>&mdash; Ethan White (@ethanwhite) <a href="https://twitter.com/ethanwhite/status/556119480493813760">January 16, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/tomjwebb">@tomjwebb</a> it also prevents a lot of different bad practices. It is possible to do some of this in Excel. <a href="https://twitter.com/tpoi">@tpoi</a></p>&mdash; Ethan White (@ethanwhite) <a href="https://twitter.com/ethanwhite/status/556119826582605824">January 16, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<br>
+<br>
+<br>
+
+
+<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/ethanwhite">@ethanwhite</a> +1 Enforcing data types, options from selection etc, just some useful things a DB gives you, if you turn them on <a href="https://twitter.com/tomjwebb">@tomjwebb</a> <a href="https://twitter.com/tpoi">@tpoi</a></p>&mdash; Gavin Simpson (@ucfagls) <a href="https://twitter.com/ucfagls/status/556120176748290048">January 16, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<br>
+<br>
+
+## **Data formats**
+
+- **`.csv`**: *comma* separated values. 
+- **`.tsv`**: *tab* separated values.
+- **`.txt`**: no formatting specified.
+
+
+<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/tomjwebb">@tomjwebb</a> It has to be interoperability/openness - can I read your data with whatever I use, without having to convert it?</p>&mdash; Paul Swaddle (@paul_swaddle) <a href="https://twitter.com/paul_swaddle/status/556148166270406656">January 16, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+> **more unusual formats will need instructions on use.**
+
+<br>
+<br>
+
+## **Ensure data is machine readable**
+
+### bad
+
+<img src="https://raw.githubusercontent.com/annakrystalli/ACCE_RDM/master/Rmd/assets/img/bad_xl1.png" width=600px>
+
+##
+
+### bad
+<img src="https://raw.githubusercontent.com/annakrystalli/ACCE_RDM/master/Rmd/assets/img/bad_xl2.png" width=600px>
+
+##
+
+### good 
+<img src="https://raw.githubusercontent.com/annakrystalli/ACCE_RDM/master/Rmd/assets/img/good_xl.png" width=600px>
+
+##
+
+### ok
+
+<img src="https://raw.githubusercontent.com/annakrystalli/ACCE_RDM/master/Rmd/assets/img/ok_xl.png" width=600px>
+
+- could help data entry
+- `.csv` or `.tsv` copy would need to be saved.
+
+<br>
+<br>
+
+
+## **Use good null values**
+
+### Missing values are a fact of life
+
+- Usually, best solution is to **leave blank**
+- **`NA`** or **`NULL`** are also good options
+- **NEVER use `0`**. Avoid numbers like **`-999`**
+- Don’t make up your own code for missing values
+
+
+<br>
+<br>
+
+## [**`read.csv()`**](http://stat.ethz.ch/R-manual/R-devel/library/utils/html/read.table.html) **utilities**
+
+- **`na.string`:** character vector of values to be coded missing and replaced with `NA` to argument eg
+- **`strip.white`:** Logical. if `TRUE` strips leading and trailing white space from unquoted character fields 
+- **`blank.lines.skip`:** Logical: if `TRUE` blank lines in the input are ignored.
+- **`fileEncoding`:** if you're getting funny characters, you probably need to specify the correct encoding.
+
+```{r, eval=FALSE}
+read.csv(file, na.strings = c("NA", "-999"), strip.white = TRUE, 
+         blank.lines.skip = TRUE, fileEncoding = "mac")
+```
+
+<br>
+<br>
+
+## [**`readr::read_csv()`**](https://cran.r-project.org/web/packages/readr/readr.pdf) **utilities**
+
+- **`na`:** character vector of values to be coded missing and replaced with `NA` to argument eg
+- **`trim_ws`:** Logical. if `TRUE` strips leading and trailing white space from unquoted character fields 
+- **`col_types`:** Allows for column data type specification. ([see more](https://cran.r-project.org/web/packages/readxl/vignettes/cell-and-column-types.html))
+- **`locale`:** controls things like the default time zone, encoding, decimal mark, big mark, and day/month names
+- **`skip`:** Number of lines to skip before reading data.
+- **`n_max`:** Maximum number of records to read.
+
+```{r, eval=FALSE}
+read_csv(file, col_names = TRUE, col_types = NULL, locale = default_locale(), 
+         na = c("", "NA", "-999"), trim_ws = TRUE, skip = 0, n_max = Inf)
+```
+
+<br>
+<br>
+
+
+## **Basic quality control**
+
+#### Have a look at your data with `Viewer(df)`
+
+<br>
+
+- Check **empty cells**
+- Check the **range of values** (and value types) in each column matches expectation. Use `summary(df)`
+- Check **units of measurement**
+- Check your **software interprets your data correctly** eg.   
+    for a data frame `df`;
+    - `head(df)` (see top few rows) and `str(df)` (see object structure) are useful.
+- consider writing some **simple QA tests** (eg. checks against *number of dimensions*, *sum of numeric columns* etc)
+
+<br>
+<br>
+
+## **Raw data are sacrosanct**
+
+<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/tomjwebb">@tomjwebb</a> don&#39;t, not even with a barge pole, not for one second, touch or otherwise edit the raw data files. Do any manipulations in script</p>&mdash; Gavin Simpson (@ucfagls) <a href="https://twitter.com/ucfagls/status/556107371634634755">January 16, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/tomjwebb">@tomjwebb</a> <a href="https://twitter.com/srsupp">@srsupp</a> Keep one or a few good master data files (per data collection of interest), and code your formatting with good annotation.</p>&mdash; Desiree Narango (@DLNarango) <a href="https://twitter.com/DLNarango/status/556128407445323778">January 16, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<br>
+<br>
+
+## **Know your masters** {.columns-2}
+
+- identify the `master` copy of files
+- keep it safe and and accessible
+- consider version control
+- consider centralising
+
+<center>
+<img src="http://www.thebugplanetstore.com/2014/wp-content/uploads/2012/03/master-file-03.jpg" width=400px>
+
+source: http://www.thebugplanetstore.com/store/master-file/
+</center>
+
+<br>
+<br>
+
+## **Avoid catastrophe**
+
+### **Backup: on disk**
+
+- consider using backup software like [Time Machine](https://support.apple.com/en-gb/HT201250) (mac) or [File History](http://www.thundercloud.net/infoave/new/windows-10-has-a-time-machine/) (Windows 10)
+
+
+### **Backup: in the cloud**
+
+- dropbox, googledrive etc.
+- if [installed](https://tools.google.com/dlpage/drive) on your system, can programmatically access them through `R`
+- some version control
+
+<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/tomjwebb">@tomjwebb</a> Back it up</p>&mdash; Ben Bond-Lamberty (@BenBondLamberty) <a href="https://twitter.com/BenBondLamberty/status/556120946722222080">January 16, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<br>
+
+
+## **Backup: the Open Science Framework** [osf.io](https://osf.io/)
+
+- version controlled
+- easily shareable
+- works with other apps (eg googledrive, github)
+- work on an interface with R ([OSFr](https://github.com/chartgerink/osfr)) is in progress. See more [here](https://youtu.be/cnE3AcdeGVY)
+
+<br>
+
+
+## **Backup: Github**
+
+- most solid version control.
+
+- keep everything in one project folder.
+
+- Can be problematic with really large files.
+
+<br>
+<br>
+
+# Metadata 
+
+### Documenting your data
+
+<br>
+
+
+## You got data. Is it enough?
+
+<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/tomjwebb">@tomjwebb</a> I see tons of spreadsheets that i don&#39;t understand anything (or the stduent), making it really hard to share.</p>&mdash; Erika Berenguer (@Erika_Berenguer) <a href="https://twitter.com/Erika_Berenguer/status/556111838715580417">January 16, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/tomjwebb">@tomjwebb</a> <a href="https://twitter.com/ScientificData">@ScientificData</a> &quot;Document. Everything.&quot; Data without documentation has no value.</p>&mdash; Sven Kochmann (@indianalytics) <a href="https://twitter.com/indianalytics/status/556120920881115136">January 16, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+##
+
+<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="it" dir="ltr"><a href="https://twitter.com/tomjwebb">@tomjwebb</a> Annotate, annotate, annotate!</p>&mdash; CanJFishAquaticSci (@cjfas) <a href="https://twitter.com/cjfas/status/556109252788379649">January 16, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="und" dir="ltr">Document all the metadata (including protocols).<a href="https://twitter.com/tomjwebb">@tomjwebb</a></p>&mdash; Ward Appeltans (@WrdAppltns) <a href="https://twitter.com/WrdAppltns/status/556108414955560961">January 16, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+## 
+
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">You download a zip file of <a href="https://twitter.com/hashtag/OpenData?src=hash">#OpenData</a>. Apart from your data file(s), what else should it contain?</p>&mdash; Leigh Dodds (@ldodds) <a href="https://twitter.com/ldodds/status/828657155863638016">February 6, 2017</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<br>
+<br>
+
+## **#otherpeoplesdata dream match!** {.columns-2}
+
+### **Thought experiment: Imagine a dream open data set**
+
+It's out there somewhere:
+
+### **How would you locate it?**
+
+- what details would you need to know to determine relevance? 
+- what information would you need to know to use it?
+
+<br>
+
+<center>
+<img src="assets/img/missing-unicorn.jpg" height="400px">
+</center>
+
+<br>
+<br>
+
+## **metadata = data about data**
+
+> ### Information that **describes, explains, locates**, or in some way makes it easier to **find, access**, and **use** a resource (in this case, data). 
+
+<br>
+
+<img src="http://chiphouston.com/wp-content/uploads/2016/06/who-what-when-where-and-why11.jpg" width="300px">
+
+<smaller>source: http://chiphouston.com/wp-content/uploads/2016/06/who-what-when-where-and-why11.jpg </smaller>
+
+<br>
+<br>
+
+
+
+## **Data Reuse Checklist**
+
+http://mozillascience.github.io/checklist/
+
+<br>
+<br>
+
+<img src="https://raw.githubusercontent.com/annakrystalli/ACCE_RDM/master/Rmd/assets/img/msl logo.png" width="300px">
+
+<br>
+<br>
+
+## **Backbone of digital curation**
+
+
+#### **Without it a digital resource may be irretrievable, unidentifiable or unusable**
+
+
+### **Descriptive**
+
+- enables **identification, location** and **retrieval** of data, often includes use of **controlled vocabularies** for classification and indexing.
+
+### **Technical**
+
+- describes the **technical processes** used to **produce**, or required to **use** a digital data object.
+
+### **Administrative**
+
+- used to manage **administrative aspects** of the digital object e.g. **intellectual property rights and acquisition.**
+
+
+This usually takes the form of a structured set of elements. 
+
+<br>
+<br>
+
+## **Elements of metadata**
+
+- #### **Structured data files:**
+    - readable by machines and humans, accessible through the web
+- #### **Controlled vocabularies** eg. [NERC Vocabulary server](https://www.bodc.ac.uk/resources/products/web_services/vocab/)
+    - allows for connectivity of data
+    
+### **KEY TO SEARCH FUNCTION**
+- By structuring & adhering to controlled vocabularies, data can be **combined, accessed** and **searched!**
+- **Different communities** develop **different standards** which define both the structure and content of metadata
+
+<br>
+<br>
+
+## **Organising data and metadata**
+
+- Start at the very least by **creating a metadata tab within your raw data spreadsheets**
+
+- Ideally set up a system of **normalised tables** ([see section 3 in this post](https://dynamicecology.wordpress.com/2016/08/22/ten-commandments-for-good-data-management/)) and **`README`** documents to manage and document metadata.
+
+
+- **Ensure everything someone might need to understand your data is documented**
+
+- **Different types data require different metadata**
+
+- ### **When you're ready to publish, structure metadata into an** [**`XML`**](https://en.wikipedia.org/wiki/XML) file, a **searchable, shareable file**.
+
+<br>
+<br>
+
+## **Make your data alignable and generalisable**
+
+### **What information would other users need to combine your data with theirs?**
+
+- time `temporal (time of day, day, month, year, season)`
+- space `geography (lat, lon, postcode)`
+- taxonomy `species name; authority / source`
+- provide information on **extent** and **resolution**
+
+<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/tomjwebb">@tomjwebb</a> record every detail about how/where/why it is collected</p>&mdash; Sal Keith (@Sal_Keith) <a href="https://twitter.com/Sal_Keith/status/556110605053349888">January 16, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<br>
+<br>
+
+## Acknowledgements
+
+### **Materials remixed from:**
+
+- **ACCE Research Data Management** [workshop materials](https://annakrystalli.github.io/ACCE_RDM/Rmd/index.html)
+
+- **Data carpentry** [File Organization workshop materials](https://github.com/datacarpentry/rr-organization1)
+
