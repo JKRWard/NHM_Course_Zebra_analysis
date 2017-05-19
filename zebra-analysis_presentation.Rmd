@@ -155,7 +155,7 @@ addThese <- rename(addThese, tooth_p1_length = fit)
 ggplot(data = newzebra, aes(x = skull_length, y = tooth_p1_length)) + 
   geom_point(size = 3, aes(color = newspecies)) +
   labs(x = "Skull length (mm)", y = "Length of first premolar (mm)") +
-  theme_bw() +
+  theme_classic() +
   geom_smooth(data = addThese, aes(ymin = lwr, ymax = upr), stat = "identity")
 pander(tidy(z_model), justify = c('left','right','right','right','right'), style = 'rmarkdown')
 ```
@@ -168,10 +168,12 @@ pander(tidy(z_model), justify = c('left','right','right','right','right'), style
 ```{r, echo = F}
 box <- ggplot(rawd) +
   geom_boxplot(aes(species, skull_length)) +
+  theme_classic()+
   coord_flip()
 
 box2 <- ggplot(newzebra) +
   geom_boxplot(aes(newspecies, skull_length)) +
+  theme_classic()+
   coord_flip()
 
 
@@ -196,7 +198,7 @@ ylabel <- "Length of first premolar (mm)"
 
 # 1. PLOT your data
 firstplot <- ggplot(data = df) +
-  geom_point(aes_string(x = continuous_predictor_name, y = continuous_response_name, color = categorical_name)) +
+  geom_point(aes_string(x = continuous_predictor_name, y = continuous_response_name, color = categorical_name)) 
   labs(x = xlabel, y = ylabel)
  
 # 2. Make a model (with an interaction term)
@@ -238,7 +240,8 @@ pander(tidy(anova(mymodel)), justify = c('left','right','right','right','right',
 ```{r, echo = FALSE, warning = FALSE}
 
 newplot <- firstplot +
-  geom_smooth(data = addThese, aes_string(x = continuous_predictor_name, y = continuous_response_name, ymin = "lwr", ymax = "upr", color = categorical_name), stat = "identity")
+  geom_smooth(data = addThese, aes_string(x = continuous_predictor_name, y = continuous_response_name, ymin = "lwr", ymax = "upr", color = categorical_name), stat = "identity")+
+  theme_classic()
 newplot
 
 ### Model coefficients
