@@ -13,6 +13,8 @@ geom_point(mapping = aes(x= skull_length, y = skull_width, colour= species)) +
   theme_classic()
 pl
 
+
+
 # Adding sex to the plot by coding the shape to differ with sex 
 pl1 <-
   ggplot(data = bur, aes(x = skull_length, y = skull_width, colour = species)) +

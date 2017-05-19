@@ -20,10 +20,10 @@ We investigated allomety in two zebra species using skull measurements taken fro
 
 
 ```{r}
-# library(tidyverse)
-# rawd <- read_csv("./data/2017-05-15_zebra-collection-data.csv")
-# # looking only at the burcelli species 
-# bur <- rawd %>% filter(!species =="Equus_greyvi")
+library(tidyverse)
+rawd <- read_csv("./data/2017-05-15_zebra-collection-data.csv")
+# looking only at the burcelli species
+bur <- rawd %>% filter(!species =="Equus_greyvi")
 ```
 
 ### Methods
@@ -67,13 +67,13 @@ box
 
 ```{r}
 # creating an attribute table
-library(RCurl)
-eval(parse(text = getURL(
-    "https://raw.githubusercontent.com/annakrystalli/ACCE_RDM/master/R/eml_utils.R",
-    ssl.verifypeer = FALSE)))
-
-attr_shell <- get_attr_shell(rawd)
-attr_shell
+# library(RCurl)
+# eval(parse(text = getURL(
+#     "https://raw.githubusercontent.com/annakrystalli/ACCE_RDM/master/R/eml_utils.R",
+#     ssl.verifypeer = FALSE)))
+# 
+# attr_shell <- get_attr_shell(rawd)
+# attr_shell
 ```
 
 ![Bear](https://placebear.com/g/200/300)
