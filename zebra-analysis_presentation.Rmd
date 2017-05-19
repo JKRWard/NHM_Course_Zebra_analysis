@@ -198,7 +198,7 @@ ylabel <- "Length of first premolar (mm)"
 
 # 1. PLOT your data
 firstplot <- ggplot(data = df) +
-  geom_point(aes_string(x = continuous_predictor_name, y = continuous_response_name, color = categorical_name)) 
+  geom_point(aes_string(x = continuous_predictor_name, y = continuous_response_name, color = categorical_name)) +
   labs(x = xlabel, y = ylabel)
  
 # 2. Make a model (with an interaction term)
