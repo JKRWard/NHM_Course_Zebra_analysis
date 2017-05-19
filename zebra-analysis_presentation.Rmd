@@ -130,6 +130,7 @@ tbl_df(newzebra)
 ## Analysis 1: ANOVA predicting P1 molar length given skull length
 
 - In the initial linear regression, P1 molar length was significantly predicted by skull length (Table 1)
+- The model coefficients indicated that an increase in skull length of 1 cm predicted an increase in P1 molar length of 0.5 mm.
 
 ### Table 1. ANOVA results
 ```{r, echo = FALSE}
@@ -164,10 +165,10 @@ pander(tidy(z_model), justify = c('left','right','right','right','right'), style
 
 ## Analysis 2: ANCOVA predicting P1 molar length given skull length and species
 
-- As skull length was numerically larger in *Equus Greyvi* than in *Equus Burchelli* (Figure 3), an ANCOVA predicting P1 molar length given skull length and species was run
+- As mean skull length was numerically larger in *Equus Greyvi* than in *Equus Burchelli* (Figure 3), an ANCOVA predicting P1 molar length given skull length and species was run
 - When the species were considered separately:
     + skull length did not predict P1 molar length in *Equus Burchelli* (Table 2, Figure 4).
-    + the difference between species was not significant, although there were only 4 *Equus Greyvi* skulls in the sample
+    + the difference between species was not statistically significant, although there were only 4 *Equus Greyvi* skulls in the sample
 
 ```{r, echo = FALSE}
 
@@ -256,7 +257,7 @@ myautoplot
 
 # Backup slides
 
-### CHeck of model assumptions (ANOVA)
+### Check of model assumptions (ANOVA)
 ```{r, echo = FALSE}
 autoplot(z_model, smooth.colour = NA)
 ```
