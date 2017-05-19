@@ -164,6 +164,21 @@ pander(tidy(z_model), justify = c('left','right','right','right','right'), style
 <br>
 
 ## Analysis 2: ANCOVA predicting P1 molar length given skull length and species
+- we looked to see if skull length was statisticaly different amongst different species 
+```{r, echo = F}
+box <- ggplot(rawd) +
+  geom_boxplot(aes(species, skull_length)) +
+  coord_flip()
+
+box2 <- ggplot(newzebra) +
+  geom_boxplot(aes(newspecies, skull_length)) +
+  coord_flip()
+
+
+box
+box2
+
+```
 
 - As mean skull length was numerically larger in *Equus Greyvi* than in *Equus Burchelli* (Figure 3), an ANCOVA predicting P1 molar length given skull length and species was run
 - When the species were considered separately:
