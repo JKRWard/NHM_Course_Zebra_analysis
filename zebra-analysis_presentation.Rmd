@@ -1,0 +1,266 @@
+---
+title: "Zebra skull analysis"
+author: "Joe Bostok-Jones, Joe Broomfield, Matthew Greenwell, Heather Lang, Jessica Ward"
+date: "17 May 2017"
+output:
+  html_document:
+    fig_width: 7
+    self_contained: no
+    theme: journal
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+  ioslides_presentation:
+    highlight: pygments
+    widescreen: yes
+---
+
+
+<script>window.twttr = (function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0],
+    t = window.twttr || {};
+  if (d.getElementById(id)) return t;
+  js = d.createElement(s);
+  js.id = id;
+  js.src = "https://platform.twitter.com/widgets.js";
+  fjs.parentNode.insertBefore(js, fjs);
+
+  t._e = [];
+  t.ready = function(f) {
+    t._e.push(f);
+  };
+
+  return t;
+}(document, "script", "twitter-wjs"));</script>
+
+```{r, echo = FALSE, include = FALSE}
+library(ggplot2)
+library(tidyverse)
+library(stringr)
+library(ggfortify)
+library(pander)
+library(knitr)
+library(broom)
+```
+
+
+```{r, echo = FALSE}
+
+if(names(rmarkdown::metadata$output)[1] == "html_document"){
+    hash <- "#"}
+if(names(rmarkdown::metadata$output)[1] == "ioslides_presentation"){
+    hash <- ""}
+```
+
+<br>
+
+# Abstract
+
+- Black with white stripes or white with black stripes? 
+- Does anyone actually care?
+
+<br>
+<br>
+
+# Introduction
+
+- We investigated allometry in adult zebras using measurements taken from museum specimen skulls
+    + We wondered what things might predict tooth length (don't we all?!)
+- At this point we would usually:
+    + write a bit about about why we are doing this study
+    + maybe give you some nice zebra facts
+- As we are lacking in zebra information, however, we have included a fun zebra gif for you
+
+![Dancing zebra!! Woohoo](https://media.giphy.com/media/bHoFqabfGJLpu/giphy.gif?response_id=591dbf997c2f1a226c5beb57)
+
+<br>
+<br>
+
+
+```{r echo = FALSE, include = FALSE}
+rawd <- read_csv("./data/2017-05-15_zebra-collection-data.csv")
+
+# Make new column that collates the subspecies together using sub and a regular expression.
+newzebra <- rawd %>% rowwise() %>% mutate(newspecies = sub("Equus_burchelli.*", "Equus_burchelli", species))
+tbl_df(newzebra)
+```
+
+# Methods
+
+## Sample description
+- Adult zebra skulls were sampled from the collections of the Natural History Museum, London, UK
+
+## Measurements
+- Skull length was measured using a rule placed on the table
+    + Each skull was placed beside the rule so that the ventral surface of the upper jaw was displayed
+    + An exercise book was placed at the posterior and anterior of each skull and the distance between the two was measured (Figure 1)
+<br>
+![Figure 1. Zebra skull length measurement method](./images/zebra_skull_length_measurement-method.png)
+<br>
+<br>
+- Premolar one (P1) on the left hand side of each skull was measured using a pair of calipers (Figure 2)
+<br>
+    +
+![Figure 2. Zebra P1 length measurement method](./images/zebra_tooth-P1_length_measurement-method.png)
+
+## Statistical analyses
+- Analyses of predictors of P1 molar length were conducted in `r R.version.string`
+
+<br>
+<br>
+
+# Results
+
+## Sample description
+
+```{r}
+
+
+```
+
+- All skulls sampled (N = `r nrow(newzebra)`) were included in the analyses
+    + The skulls belonged to 2 species of zebra; *Equus grevyi* (n = 4) and *Equus burchelli* (n = 24)
+    + An unknown number of *Equus zebra* skulls were stuck in cupboards that would not unlock, and could not be included in the sample, as criminal damage is a bad thing
+- The mean skull length was `r round(sapply(select(newzebra,skull_length),mean), digits = 1)` mm (SD = `r round(sapply(select(newzebra,skull_length),sd), digits=2)`) and the mean P1 premolar length was `r round(sapply(select(newzebra,tooth_p1_length),mean), digits = 2)` mm (SD = `r round(sapply(select(newzebra,tooth_p1_length),sd), digits = 3)`) 
+- The full <a href="./data/2017-05-15_zebra-collection-data.csv", target = "_blank">dataset</a> and <a href="./data/Zebra_attributes.csv", target = "_blank">metadata</a> are available as supplementary material [insert copyright details here when we have had the session on it]
+
+<br>
+<br>
+
+## Analysis 1: ANOVA predicting P1 molar length given skull length
+
+- In the initial linear regression, P1 molar length was significantly predicted by skull length (Table 1)
+- The model coefficients indicated that an increase in skull length of 1 cm predicted an increase in P1 molar length of 0.5 mm.
+
+### Table 1. ANOVA results
+```{r, echo = FALSE}
+z_model <- lm(tooth_p1_length ~ skull_length, data = newzebra)
+pander(tidy(anova(z_model)), justify = c('left','right','right','right','right', 'right'), style = 'rmarkdown')
+```
+
+### Figure 3. Model and coefficients
+```{r, echo = FALSE, warning = FALSE}
+## Plot regression model
+
+# Create dataframe containing line and 95% CI
+min_newX <- min(subset(newzebra, select = skull_length))
+max_newX <- max(subset(newzebra, select = skull_length))
+
+newX <- expand.grid(skull_length = seq(from = min_newX, to = max_newX, length = 100))
+newY <- predict(z_model, newdata = newX, interval = "confidence", level = 0.95)
+addThese <- data.frame(newX, newY)
+addThese <- rename(addThese, tooth_p1_length = fit)
+
+# Plot model
+ggplot(data = newzebra, aes(x = skull_length, y = tooth_p1_length)) + 
+  geom_point(size = 3, aes(color = newspecies)) +
+  labs(x = "Skull length (mm)", y = "Length of first premolar (mm)") +
+  theme_bw() +
+  geom_smooth(data = addThese, aes(ymin = lwr, ymax = upr), stat = "identity")
+pander(tidy(z_model), justify = c('left','right','right','right','right'), style = 'rmarkdown')
+```
+
+<br>
+<br>
+
+## Analysis 2: ANCOVA predicting P1 molar length given skull length and species
+
+- As mean skull length was numerically larger in *Equus Greyvi* than in *Equus Burchelli* (Figure 3), an ANCOVA predicting P1 molar length given skull length and species was run
+- When the species were considered separately:
+    + skull length did not predict P1 molar length in *Equus Burchelli* (Table 2, Figure 4).
+    + the difference between species was not statistically significant, although there were only 4 *Equus Greyvi* skulls in the sample
+
+```{r, echo = FALSE}
+
+df <- newzebra
+continuous_predictor_name <- "skull_length"
+continuous_response_name <- "tooth_p1_length"
+categorical_name <- "newspecies"
+xlabel <- "Skull length (mm)"
+ylabel <- "Length of first premolar (mm)"
+
+# 1. PLOT your data
+firstplot <- ggplot(data = df) +
+  geom_point(aes_string(x = continuous_predictor_name, y = continuous_response_name, color = categorical_name)) +
+  labs(x = xlabel, y = ylabel)
+ 
+# 2. Make a model (with an interaction term)
+mymodel <- lm(formula = as.formula(paste(continuous_response_name," ~ ",continuous_predictor_name," * ",categorical_name,sep="")), data = df)
+
+# 3. Look at the assumptions
+myautoplot <- autoplot(mymodel, smooth.colour = NA)
+
+```
+<br>
+
+### Table 2. ANCOVA results
+
+```{r, echo = FALSE}
+# 4. Look at the results
+myanova <- anova(mymodel)
+
+# 5. Add interpretation to your graph
+max_x = max(subset(df, select = paste(continuous_predictor_name)))
+min_x = min(subset(df, select = paste(continuous_predictor_name)))
+
+my_formula1 <- paste(continuous_predictor_name," = seq(from = ",min_x,", to = ",max_x,", length = 100)",sep="")
+# Just need to solve the problem of how to get the umique categories then this can be a function. levels will help
+my_formula2 <- paste("newspecies = c(\"Equus_greyvi\",\"Equus_burchelli\")", sep="")
+
+newX <- eval(parse(text = paste("expand.grid(",my_formula1, ", ", my_formula2, ")"))) 
+newY <- predict(mymodel, newdata = newX, interval = "confidence", level = 0.95)
+
+addThese <- data.frame(newX, newY)
+# Rename the fit column (always column 3)
+colnames(addThese)[3] <- continuous_response_name
+
+### Display ANOVA results
+pander(tidy(anova(mymodel)), justify = c('left','right','right','right','right', 'right'), style = 'rmarkdown')
+```
+
+### Figure 4. Model and coefficients
+
+```{r, echo = FALSE, warning = FALSE}
+
+newplot <- firstplot +
+  geom_smooth(data = addThese, aes_string(x = continuous_predictor_name, y = continuous_response_name, ymin = "lwr", ymax = "upr", color = categorical_name), stat = "identity")
+newplot
+
+### Model coefficients
+pander(tidy(mymodel), justify = c('left','right','right','right','right'), style = 'rmarkdown')
+
+```
+
+### Figure 5. Check of model assumptions (ANCOVA)
+- The relatively small number of *Equus Greyvi* data points (larger skull sizes) looked over-fitted compared with the *Equus Burchelli* data points (Figure 5).
+
+```{r, echo = FALSE}
+myautoplot
+```
+<br>
+<br>
+
+## Suggestion for further work: multivariate analysis
+
+<br>
+<br>
+
+# Acknowledgements
+- Natalie Cooper
+- Acknowledgement
+
+
+
+<br>
+<br>
+<br>
+
+# Backup slides
+
+### Check of model assumptions (ANOVA)
+```{r, echo = FALSE}
+autoplot(z_model, smooth.colour = NA)
+```
+
+
+

@@ -1,0 +1,299 @@
+≈---
+title: "zebra_project"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = FALSE, error = FALSE)
+```
+
+## Stripes
+
+```{r, echo = FALSE}
+library(tidyverse)
+library(ggplot2)
+library(ggfortify)
+library(pander)
+library(knitr)
+library(broom)
+```
+
+#Methods
+
+
+```{r}
+# Load functions that summarise data - R markdown needs to have these up front befroe the rest of the ode. In an R script, the functions can be at the end.
+
+my_test_ANOVA <- function (df, categorical_name, continuous_name, xlabel, ylabel){
+# Function takes a dataframe, and two strings: a categorical variable and a continuous variable. it then does a boxplot and an ANOVA
+
+#Syntax: myresult <- my_test_ANOVA(df, categorical_name, continuous_name, xlabel, ylabel)
+# categorical_name and continuous_name are both strings
+# Function returns a list with the following items:
+#[1] "Figure" = boxplot of the original data
+#[2] "Model" = fitted model
+#[3] "Autoplot" = autoplot of the original data
+#[4] "ANOVA" = ANOVA
+#[5] "Coeffs" = coefficients from ANOVA
+
+#After you have called the function, you can access these things e.g.
+# myresult[1] - will give you the plot
+# myresult[4] - will give you the ANOVA table
+
+# aes_string took me forever to find
+
+# 1. PLOT your data
+ myplot <- ggplot(data = df, aes_string(x = categorical_name, y = continuous_name)) +
+    geom_boxplot() +
+   labs(x = xlabel, y = ylabel)+
+   coord_flip()
+ 
+# 2. Fit your model
+mymodel <- lm(formula = as.formula(paste(continuous_name,categorical_name,sep="~")), data = df)
+
+# 3. Look at the assumptions
+myautoplot <- autoplot(mymodel, smooth.colour = NA)
+
+# 4. Look at the results
+myanova <- anova(mymodel)
+mytable_of_doom <- summary(mymodel)
+
+# 5. Add interpretation to your graph
+
+# Return list of outputs
+newlist <- list("Figure" = myplot, "Model" = mymodel, "Autoplot" = myautoplot, "ANOVA" = myanova, "Coefficients" = mytable_of_doom)
+return(newlist)
+}
+
+
+my_test_ANCOVA <- function (df, continuous_response_name, continuous_predictor_name, categorical_name, xlabel, ylabel){
+  #Dataset is a dataframe, the names are strings
+# aes_string took me forever to find
+
+# 1. PLOT your data
+firstplot <- ggplot(data = df) +
+  geom_point(aes_string(x = continuous_predictor_name, y = continuous_response_name, color = categorical_name)) +
+  labs(x = xlabel, y = ylabel)
+ 
+# 2. Make a model (with an interaction term)
+mymodel <- lm(formula = as.formula(paste(continuous_response_name," ~ ",continuous_predictor_name," * ",categorical_name,sep="")), data = df)
+
+# 3. Look at the assumptions
+myautoplot <- autoplot(mymodel, smooth.colour = NA)
+
+# 4. Look at the results
+myanova <- anova(mymodel)
+mytable_of_doom <- summary(mymodel)
+
+# 5. Add interpretation to your graph
+
+max_x = max(subset(df, select = tooth_p1_width))#paste(continuous_predictor_name)))
+min_x = min(subset(df, select = tooth_p1_width))#paste(continuous_predictor_name)))
+
+#min_DENSITY = min(subset(limpet, select=DENSITY))
+
+# 100 points to make the CI smooth
+# If you just wanted the line then 2 points would be adequate
+# expand.grid is a bit like seq but for data frames
+
+newX <- expand.grid(tooth_p1_width = seq(from = min_x, to = max_x, length = 100), sex = c("Male","Female"))
+newX
+
+newY <- predict(mymodel, newdata = newX, interval = "confidence", level = 0.95)
+
+addThese <- data.frame(newX, newY)
+
+myplot <- firstplot +
+  geom_smooth(data = addThese, aes(ymin = lwr, ymax = upr), stat = "identity")
+
+# Return list of outputs
+newlist <- list("Figure" = myplot, "Model" = mymodel, "Autoplot" = myautoplot, "ANOVA" = myanova, "Coeffs" = mytable_of_doom)
+return(newlist)
+}
+
+# Example function to pass a string
+testt <- function(df, col1) {
+
+df[ , which(names(iris) == col1)]
+
+}
+
+testt(iris, "Sepal.Length")
+
+
+# To debug
+
+testt <- function(df, col1) {
+  #  browser()
+  df[ , which(names(iris) == col1)]
+  
+}
+
+# Helpful R package for dealing with factors
+
+library(forcats)
+# More infromation at http://github.com/hadley/forcats
+
+# http://forcats.tidyverse.org/
+# http://forcats.tidyverse.org/reference/index.html
+
+
+v1 <- c("Jan", "Feb", "Mar")
+v1 <- as.factor(v1)
+
+
+```
+
+
+```{r}
+zebra <- read_csv("./data/2017-05-15_zebra-collection-data.csv",
+                  col_types = cols(skull_length = col_double(),
+                  skull_width = col_double()))
+
+#Burchelli subgroup analysis
+burchelli_sg <- zebra %>% filter(species != "Equus_greyvi")
+
+# For each of the continuous variables, does the subspecies make a difference?
+t_length_res <- my_test_ANOVA(burchelli_sg, "species", "tooth_p1_length", "Burchelli subspecies", "Length of tooth P1 (mm)")
+t_width_res <- my_test_ANOVA(burchelli_sg, "species", "tooth_p1_width", "Burchelli subspecies", "Width of tooth P1 (mm)")
+sk_length_res <- my_test_ANOVA(burchelli_sg, "species", "skull_length", "Burchelli subspecies", "Length of skull (mm)")
+sk_width_res <- my_test_ANOVA(burchelli_sg, "species", "skull_width", "Burchelli subspecies", "Width of skull (mm)")
+
+# Analysis with dataset omitting subspecies
+
+
+# Run with subspecies included first
+
+#t_length_pb_t_width_cv_sex_res <- my_test_ANCOVA(burchelli_sg, "tooth_p1_length", "tooth_p1_width", "sex", "Length of tooth P1 (mm)", "Width of tooth P1 (mm)")
+
+df <- zebra
+continuous_predictor_name <- "tooth_p1_length"
+continuous_response_name <- "tooth_p1_width"
+categorical_name <- "sex"
+xlabel <- "Length of tooth P1 (mm)"
+ylabel <- "Width of tooth P1 (mm)"
+
+
+# 1. PLOT your data
+firstplot <- ggplot(data = df) +
+  geom_point(aes_string(x = continuous_predictor_name, y = continuous_response_name, color = categorical_name)) +
+  labs(x = xlabel, y = ylabel)
+firstplot
+ 
+# 2. Make a model (with an interaction term)
+mymodel <- lm(formula = as.formula(paste(continuous_response_name," ~ ",continuous_predictor_name," * ",categorical_name,sep="")), data = df)
+
+tidy_test <- tidy(mymodel)
+tbl_df(tidy_test)
+browser()
+
+# 3. Look at the assumptions
+myautoplot <- autoplot(mymodel, smooth.colour = NA)
+
+# 4. Look at the results
+myanova <- anova(mymodel)
+mytable_of_doom <- summary(mymodel)
+
+# 5. Add interpretation to your graph
+
+max_x = max(subset(df, select = paste(continuous_predictor_name)))
+min_x = min(subset(df, select = paste(continuous_predictor_name)))
+
+# Insert code to find the unique categorical variable options
+
+my_formula1 <- paste(continuous_predictor_name," = seq(from = ",min_x,", to = ",max_x,", length = 100)",sep="")
+
+# Just need to solve the problem of how to get the umique categories then I'm done
+
+# levels
+
+#unique_categories <- unique(select(df,eval((parse(text = paste(continuous_predictor_name))))))
+
+#tbl_df(unique_categories)
+
+my_formula2 <- paste("sex = c(\"Male\",\"Female\")", sep="")
+
+newX <- eval(parse(text = paste("expand.grid(",my_formula1, ", ", my_formula2, ")"))) 
+
+substitute()
+
+
+newY <- predict(mymodel, newdata = newX, interval = "confidence", level = 0.95)
+
+addThese <- data.frame(newX, newY)
+# Rename the fit column
+colnames(addThese)[3] <- continuous_response_name
+
+#Hardwired version to check that data frames are OK
+newplot <- firstplot +
+  geom_smooth(data = addThese, aes_string(x = continuous_predictor_name, y = continuous_response_name, ymin = "lwr", ymax = "upr", color = categorical_name), stat = "identity")
+newplot
+
+modeltable <- tidy(mymodel)
+
+
+# Return list of outputs
+newlist <- list("Figure" = firstplot, "Model" = mymodel, "Autoplot" = myautoplot, "ANOVA" = myanova, "Coeffs" = mytable_of_doom)
+
+
+
+
+```
+
+#Results
+```{r}
+# t_length_pb_t_width_cv_species_res[1]
+# t_length_pb_t_width_cv_species_res[3]
+# pander(t_length_pb_t_width_cv_species_res[4])
+# pander(t_length_pb_t_width_cv_species_res[5])
+
+newlist[1]
+newlist[3]
+pander(tidy(mymodel), justify = c('left','right','right','right','right'), style = 'rmarkdown')
+
+```
+
+#Appendix
+##1. Does Burchelli subspecies significantly affect tooth length (P1)?
+
+```{r, echo = FALSE}
+
+# tbl_df(t_length_res[2])
+# 
+# t_length_res[1]
+# t_length_res[3]
+#pander(tidy(t_length_res[2,2]))
+#pander(t_length_res[4])
+#pander(t_length_res[5])
+```
+
+#Appendix
+##2. Does Burchelli subspecies significantly affect the tooth width (P1)?
+
+```{r, echo = FALSE}
+# # t_width_res[1]
+# # t_width_res[3]
+# pander(t_length_res[4])
+# pander(t_length_res[5])
+```
+
+#Appendix
+##3. Does Burchelli subspecies significantly affect skull length?
+
+```{r, echo = FALSE}
+# sk_length_res[1]
+# sk_length_res[3]
+# pander(sk_length_res[4])
+```
+
+#Appendix
+##4. Does Burchelli subspecies significantly affect skull width?
+
+```{r, echo = FALSE}
+# sk_width_res[1]
+# sk_width_res[3]
+# pander(sk_width_res[4])
+```
+
+```
+
