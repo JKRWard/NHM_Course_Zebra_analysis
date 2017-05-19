@@ -165,9 +165,8 @@ pander(tidy(z_model), justify = c('left','right','right','right','right'), style
 ## Analysis 2: ANCOVA predicting P1 molar length given skull length and species
 
 - As skull length was numerically larger in *Equus Greyvi* than in *Equus Burchelli* (Figure 3), an ANCOVA predicting P1 molar length given skull length and species was run
-- When the species were considered separately:
-    + skull length did not predict P1 molar length in *Equus Burchelli* (Table 2, Figure 4).
-    + the difference between species was not significant, although there were only 4 *Equus Greyvi* skulls in the sample
+- Skull length did not predict P1 molar length in *Equus Burchelli* (Table 2, Figure 4).
+- The *Equus Greyvi* data points looked over-fitted (Figure 5).
 
 ```{r, echo = FALSE}
 
@@ -231,7 +230,6 @@ pander(tidy(mymodel), justify = c('left','right','right','right','right'), style
 ```
 
 ### Figure 5. Check of model assumptions (ANCOVA)
-- The relatively small number of *Equus Greyvi* data points (larger skull sizes) looked over-fitted compared with the *Equus Burchelli* data points (Figure 5).
 
 ```{r, echo = FALSE}
 myautoplot
@@ -256,7 +254,7 @@ myautoplot
 
 # Backup slides
 
-### CHeck of model assumptions (ANOVA)
+### Analysis 1
 ```{r, echo = FALSE}
 autoplot(z_model, smooth.colour = NA)
 ```

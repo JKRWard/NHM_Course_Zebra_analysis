@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Joe Bostok-Jones, Joe Broomfield, Matthew Greenwell, Heather Lang, Jessica Ward" />
+
+<meta name="date" content="2017-05-17" />
+
+<title>Zebra skull analysis</title>
+
+<script src="zebra-analysis_presentation_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="zebra-analysis_presentation_files/bootstrap-3.3.5/css/journal.min.css" rel="stylesheet" />
+<script src="zebra-analysis_presentation_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="zebra-analysis_presentation_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="zebra-analysis_presentation_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="zebra-analysis_presentation_files/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="zebra-analysis_presentation_files/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="zebra-analysis_presentation_files/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="zebra-analysis_presentation_files/navigation-1.1/tabsets.js"></script>
+<link href="zebra-analysis_presentation_files/highlightjs-1.1/default.css" rel="stylesheet" />
+<script src="zebra-analysis_presentation_files/highlightjs-1.1/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Zebra skull analysis</h1>
+<h4 class="author"><em>Joe Bostok-Jones, Joe Broomfield, Matthew Greenwell, Heather Lang, Jessica Ward</em></h4>
+<h4 class="date"><em>17 May 2017</em></h4>
+
+</div>
+
+
+<script>window.twttr = (function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0],
+    t = window.twttr || {};
+  if (d.getElementById(id)) return t;
+  js = d.createElement(s);
+  js.id = id;
+  js.src = "https://platform.twitter.com/widgets.js";
+  fjs.parentNode.insertBefore(js, fjs);
+
+  t._e = [];
+  t.ready = function(f) {
+    t._e.push(f);
+  };
+
+  return t;
+}(document, "script", "twitter-wjs"));</script>
+<p><br></p>
+<div id="abstract" class="section level1">
+<h1>Abstract</h1>
+<ul>
+<li>Black with white stripes or white with black stripes?</li>
+<li>Does anyone actually care?</li>
+</ul>
+<p><br> <br></p>
+</div>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<ul>
+<li>We investigated allometry in adult zebras using measurements taken from museum specimen skulls
+<ul>
+<li>We wondered what things might predict tooth length (don’t we all?!)</li>
+</ul></li>
+<li>At this point we would usually:
+<ul>
+<li>write a bit about about why we are doing this study</li>
+<li>maybe give you some nice zebra facts</li>
+</ul></li>
+<li>As we are lacking in zebra information, however, we have included a fun zebra gif for you</li>
+</ul>
+<div class="figure">
+<img src="https://media.giphy.com/media/bHoFqabfGJLpu/giphy.gif?response_id=591dbf997c2f1a226c5beb57" alt="Dancing zebra!! Woohoo" />
+<p class="caption">Dancing zebra!! Woohoo</p>
+</div>
+<p><br> <br></p>
+</div>
+<div id="methods" class="section level1">
+<h1>Methods</h1>
+<div id="sample-description" class="section level2">
+<h2>Sample description</h2>
+<ul>
+<li>Adult zebra skulls were sampled from the collections of the Natural History Museum, London, UK</li>
+</ul>
+</div>
+<div id="measurements" class="section level2">
+<h2>Measurements</h2>
+<ul>
+<li>Skull length was measured using a rule placed on the table
+<ul>
+<li>Each skull was placed beside the rule so that the ventral surface of the upper jaw was displayed</li>
+<li>An exercise book was placed at the posterior and anterior of each skull and the distance between the two was measured (Figure 1) <br> <img src="images/zebra_skull_length_measurement-method.png" alt="Figure 1. Zebra skull length measurement method" /> <br> <br></li>
+</ul></li>
+<li>Premolar one (P1) on the left hand side of each skull was measured using a pair of calipers (Figure 2) <br>
+<ul>
+<li><img src="images/zebra_tooth-P1_length_measurement-method.png" title="fig:" alt="Figure 2. Zebra P1 length measurement method" /></li>
+</ul></li>
+</ul>
+</div>
+<div id="statistical-analyses" class="section level2">
+<h2>Statistical analyses</h2>
+<ul>
+<li>Analyses of predictors of P1 molar length were conducted in R version 3.4.0 (2017-04-21)</li>
+</ul>
+<p><br> <br></p>
+</div>
+</div>
+<div id="results" class="section level1">
+<h1>Results</h1>
+<div id="sample-description-1" class="section level2">
+<h2>Sample description</h2>
+<ul>
+<li>All skulls sampled (N = 28) were included in the analyses
+<ul>
+<li>The skulls belonged to 2 species of zebra; <em>Equus grevyi</em> (n = 4) and <em>Equus burchelli</em> (n = 24)</li>
+<li>An unknown number of <em>Equus zebra</em> skulls were stuck in cupboards that would not unlock, and could not be included in the sample, as criminal damage is a bad thing</li>
+</ul></li>
+<li>The mean skull length was 540.9 mm (SD = 31.86) and the mean P1 premolar length was 34.55 mm (SD = 2.421)</li>
+<li>The full <a href="./data/2017-05-15_zebra-collection-data.csv", target = "_blank">dataset</a> and <a href="./data/Zebra_attributes.csv", target = "_blank">metadata</a> are available as supplementary material [insert copyright details here when we have had the session on it]</li>
+</ul>
+<p><br> <br></p>
+</div>
+<div id="analysis-1-anova-predicting-p1-molar-length-given-skull-length" class="section level2">
+<h2>Analysis 1: ANOVA predicting P1 molar length given skull length</h2>
+<ul>
+<li>In the initial linear regression, P1 molar length was significantly predicted by skull length (Table 1)</li>
+</ul>
+<div id="table-1.-anova-results" class="section level3">
+<h3>Table 1. ANOVA results</h3>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">df</th>
+<th align="right">sumsq</th>
+<th align="right">meansq</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">skull_length</td>
+<td align="right">1</td>
+<td align="right">65.11</td>
+<td align="right">65.11</td>
+<td align="right">18.18</td>
+<td align="right">0.0002344</td>
+</tr>
+<tr class="even">
+<td align="left">Residuals</td>
+<td align="right">26</td>
+<td align="right">93.13</td>
+<td align="right">3.582</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="figure-3.-model-and-coefficients" class="section level3">
+<h3>Figure 3. Model and coefficients</h3>
+<p><img src="zebra-analysis_presentation_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">8.18</td>
+<td align="right">6.194</td>
+<td align="right">1.32</td>
+<td align="right">0.1982</td>
+</tr>
+<tr class="even">
+<td align="left">skull_length</td>
+<td align="right">0.04874</td>
+<td align="right">0.01143</td>
+<td align="right">4.264</td>
+<td align="right">0.0002344</td>
+</tr>
+</tbody>
+</table>
+<p><br> <br></p>
+</div>
+</div>
+<div id="analysis-2-ancova-predicting-p1-molar-length-given-skull-length-and-species" class="section level2">
+<h2>Analysis 2: ANCOVA predicting P1 molar length given skull length and species</h2>
+<ul>
+<li>As skull length was numerically larger in <em>Equus Greyvi</em> than in <em>Equus Burchelli</em> (Figure 3), an ANCOVA predicting P1 molar length given skull length and species was run</li>
+<li>When the species were considered separately:
+<ul>
+<li>skull length did not predict P1 molar length in <em>Equus Burchelli</em> (Table 2, Figure 4).</li>
+<li>the difference between species was not significant, although there were only 4 <em>Equus Greyvi</em> skulls in the sample</li>
+</ul></li>
+</ul>
+<p><br></p>
+<div id="table-2.-ancova-results" class="section level3">
+<h3>Table 2. ANCOVA results</h3>
+<table>
+<caption>Table continues below</caption>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">df</th>
+<th align="right">sumsq</th>
+<th align="right">meansq</th>
+<th align="right">statistic</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">skull_length</td>
+<td align="right">1</td>
+<td align="right">65.11</td>
+<td align="right">65.11</td>
+<td align="right">20.65</td>
+</tr>
+<tr class="even">
+<td align="left">newspecies</td>
+<td align="right">1</td>
+<td align="right">10.22</td>
+<td align="right">10.22</td>
+<td align="right">3.243</td>
+</tr>
+<tr class="odd">
+<td align="left">skull_length:newspecies</td>
+<td align="right">1</td>
+<td align="right">7.248</td>
+<td align="right">7.248</td>
+<td align="right">2.299</td>
+</tr>
+<tr class="even">
+<td align="left">Residuals</td>
+<td align="right">24</td>
+<td align="right">75.66</td>
+<td align="right">3.152</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr class="header">
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.0001322</td>
+</tr>
+<tr class="even">
+<td align="right">0.08432</td>
+</tr>
+<tr class="odd">
+<td align="right">0.1425</td>
+</tr>
+<tr class="even">
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="figure-4.-model-and-coefficients" class="section level3">
+<h3>Figure 4. Model and coefficients</h3>
+<p><img src="zebra-analysis_presentation_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<table>
+<caption>Table continues below</caption>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">24.14</td>
+<td align="right">14.77</td>
+</tr>
+<tr class="even">
+<td align="left">skull_length</td>
+<td align="right">0.01839</td>
+<td align="right">0.0279</td>
+</tr>
+<tr class="odd">
+<td align="left">newspeciesEquus_greyvi</td>
+<td align="right">85.58</td>
+<td align="right">53.68</td>
+</tr>
+<tr class="even">
+<td align="left">skull_length:newspeciesEquus_greyvi</td>
+<td align="right">-0.1349</td>
+<td align="right">0.08894</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr class="header">
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1.635</td>
+<td align="right">0.1152</td>
+</tr>
+<tr class="even">
+<td align="right">0.6593</td>
+<td align="right">0.516</td>
+</tr>
+<tr class="odd">
+<td align="right">1.594</td>
+<td align="right">0.1239</td>
+</tr>
+<tr class="even">
+<td align="right">-1.516</td>
+<td align="right">0.1425</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="figure-5.-check-of-model-assumptions-ancova" class="section level3">
+<h3>Figure 5. Check of model assumptions (ANCOVA)</h3>
+<ul>
+<li>The relatively small number of <em>Equus Greyvi</em> data points (larger skull sizes) looked over-fitted compared with the <em>Equus Burchelli</em> data points (Figure 5).</li>
+</ul>
+<p><img src="zebra-analysis_presentation_files/figure-html/unnamed-chunk-10-1.png" width="672" /> <br> <br></p>
+</div>
+</div>
+<div id="suggestion-for-further-work-multivariate-analysis" class="section level2">
+<h2>Suggestion for further work: multivariate analysis</h2>
+<p><br> <br></p>
+</div>
+</div>
+<div id="acknowledgements" class="section level1">
+<h1>Acknowledgements</h1>
+<ul>
+<li>Natalie Cooper</li>
+<li>Acknowledgement</li>
+</ul>
+<p><br> <br> <br></p>
+</div>
+<div id="backup-slides" class="section level1">
+<h1>Backup slides</h1>
+<div id="check-of-model-assumptions-anova" class="section level3">
+<h3>CHeck of model assumptions (ANOVA)</h3>
+<p><img src="zebra-analysis_presentation_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
